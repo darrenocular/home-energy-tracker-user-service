@@ -31,6 +31,35 @@ public class UserService {
         return toDto(saved);
     }
 
+    public UserDto getUserById(Long id) {
+        log.info("Retrieving user by id {}", id);
+        return userRepository.findById(id)
+                .map(this::toDto)
+                .orElse(null);
+    }
+
+    public void updateUser(Long id, UserDto input) {
+        log.info("Updating user {}", input);
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        user.setFirstName(input.getFirstName());
+        user.setLastName(input.getLastName());
+        user.setEmail(input.getEmail());
+        user.setAddress(input.getAddress());
+        user.setAlerting(input.isAlerting());
+        user.setEnergyAlertingThreshold(input.getEnergyAlertingThreshold());
+        userRepository.save(user);
+    }
+
+    public void deleteUser(Long id) {
+        log.info("Deleting user {}", id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        userRepository.delete(user);
+    }
+
     private UserDto toDto(User user) {
         return UserDto.builder()
                 .id(user.getId())
